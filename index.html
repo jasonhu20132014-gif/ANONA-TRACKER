@@ -10,9 +10,10 @@
   <style>
     body { font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
     .tracking-input { font-size: 1.25rem; letter-spacing: 3px; }
+    #found-tracking { word-break: break-all; }
   </style>
 </head>
-<body class="bg-gray-50 py-12">
+<body class="bg-gray-50 py-8">
   <div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
     <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-8 text-center">
       <h1 class="text-3xl font-bold">🚚 Anona Dual Cam Doorbell</h1>
@@ -20,7 +21,7 @@
       <p class="text-sm mt-1 opacity-90">Privacy Protected • 100% Local • No data uploaded</p>
     </div>
     
-    <div class="p-8">
+    <div class="p-6 md:p-8">
       <div class="flex border-b mb-8">
         <button onclick="switchTab(0)" id="tab0" class="tab-btn flex-1 py-4 text-center font-semibold border-b-2 border-indigo-600 text-indigo-600">I have my tracking number</button>
         <button onclick="switchTab(1)" id="tab1" class="tab-btn flex-1 py-4 text-center font-semibold text-gray-500">I don't know my tracking number</button>
@@ -50,29 +51,39 @@
         </button>
 
         <div id="result" class="hidden mt-8 p-6 bg-green-50 rounded-2xl border border-green-200">
-          <p class="text-sm text-green-600 mb-1">✅ Found your order</p>
+          <p class="text-sm text-green-600 mb-1 flex items-center gap-2">
+            <span class="text-2xl">✅</span> Found your order
+          </p>
           <p id="found-name" class="text-2xl font-bold text-gray-800"></p>
-          <div class="flex items-center justify-between mt-6">
-            <div>
-              <p class="text-xs text-gray-500">Tracking Number</p>
-              <p id="found-tracking" class="text-4xl font-mono font-bold text-green-700"></p>
-              <p id="found-carrier" class="text-xl font-semibold text-green-600"></p>
+          
+          <div class="mt-6">
+            <p class="text-xs text-gray-500 mb-1">Tracking Number</p>
+            <div class="flex items-center justify-between bg-white rounded-xl p-4 border border-gray-100">
+              <p id="found-tracking" class="text-3xl font-mono font-bold text-green-700 flex-1 pr-4"></p>
+              <button onclick="copyTracking()" 
+                      class="shrink-0 bg-green-100 hover:bg-green-200 text-green-700 px-5 py-2 rounded-xl text-sm font-medium transition">
+                📋 Copy
+              </button>
             </div>
-            <a id="track-btn" href="#" target="_blank"
-               class="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-2xl font-semibold flex items-center gap-2 transition">
-              <span>Track on 17track</span>
-              <span class="text-2xl">→</span>
-            </a>
+            <p id="found-carrier" class="text-xl font-semibold text-green-600 mt-3"></p>
           </div>
+
+          <a id="track-btn" href="#" target="_blank"
+             class="mt-8 block w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-2xl font-semibold text-center flex items-center justify-center gap-2 transition">
+            Track on 17track
+            <span class="text-2xl">→</span>
+          </a>
         </div>
       </div>
 
-      <div class="mt-8 text-xs text-gray-500 space-y-2">
-        <p>📌 How to use:</p>
+      <div class="mt-8 text-xs text-gray-500 space-y-2 px-1">
+        <p class="font-medium flex items-center gap-1">
+          <span class="text-red-500">📍</span> How to use:
+        </p>
         <p>1. Choose a tab above</p>
         <p>2. Enter tracking number OR last 4 digits of your phone</p>
         <p>3. System auto-detects carrier and opens 17track</p>
-        <p class="text-amber-600">For Anona Beta Group members only • Data runs locally on your device</p>
+        <p class="text-amber-600 text-[10px]">For Anona Beta Group members only • Data runs locally</p>
       </div>
     </div>
   </div>
@@ -148,6 +159,16 @@
       const btn = document.getElementById('track-btn');
       btn.href = `https://www.17track.net/en/carriers/${carrier.code}`;
       resultDiv.classList.remove('hidden');
+    }
+
+    function copyTracking() {
+      const tracking = document.getElementById('found-tracking').textContent;
+      navigator.clipboard.writeText(tracking).then(() => {
+        const btn = event.currentTarget;
+        const original = btn.textContent;
+        btn.textContent = '✅ Copied!';
+        setTimeout(() => btn.textContent = original, 2000);
+      });
     }
 
     document.getElementById('tracking').addEventListener('keypress', e => { if (e.key === 'Enter') checkByTracking(); });
