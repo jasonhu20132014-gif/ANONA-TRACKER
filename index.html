@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Anona Dual Cam Doorbell - Tracking Tool</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }
+    .tracking-input { font-size: 1.25rem; letter-spacing: 3px; }
+  </style>
+</head>
+<body class="bg-gray-50 py-12">
+  <div class="max-w-2xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-8 text-center">
+      <h1 class="text-3xl font-bold">🚚 Anona Dual Cam Doorbell</h1>
+      <p class="text-2xl mt-2">Tracking Tool</p>
+      <p class="text-sm mt-1 opacity-90">Privacy Protected • 100% Local • No data uploaded</p>
+    </div>
+    
+    <div class="p-8">
+      <div class="flex border-b mb-8">
+        <button onclick="switchTab(0)" id="tab0" class="tab-btn flex-1 py-4 text-center font-semibold border-b-2 border-indigo-600 text-indigo-600">I have my tracking number</button>
+        <button onclick="switchTab(1)" id="tab1" class="tab-btn flex-1 py-4 text-center font-semibold text-gray-500">I don't know my tracking number</button>
+      </div>
+
+      <div id="panel0">
+        <div class="mb-8">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Enter your tracking number</label>
+          <input id="tracking" type="text" placeholder="e.g. 9214490358020057633026 or 7321315563379586" 
+                 class="tracking-input w-full px-6 py-5 border-2 border-gray-200 rounded-2xl focus:border-indigo-500 focus:outline-none text-center font-mono">
+        </div>
+        <button onclick="checkByTracking()" 
+                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-5 rounded-2xl text-xl font-semibold transition">
+          Auto-detect carrier & Track
+        </button>
+      </div>
+
+      <div id="panel1" class="hidden">
+        <div class="mb-8">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Enter the last 4 digits of your phone number</label>
+          <input id="phone-last4" type="text" maxlength="4" placeholder="e.g. 3166" 
+                 class="w-full px-6 py-5 border-2 border-gray-200 rounded-2xl focus:border-indigo-500 focus:outline-none text-center text-4xl font-mono tracking-widest">
+        </div>
+        <button onclick="searchByPhone()" 
+                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-5 rounded-2xl text-xl font-semibold transition">
+          Find my tracking number
+        </button>
+
+        <div id="result" class="hidden mt-8 p-6 bg-green-50 rounded-2xl border border-green-200">
+          <p class="text-sm text-green-600 mb-1">✅ Found your order</p>
+          <p id="found-name" class="text-2xl font-bold text-gray-800"></p>
+          <div class="flex items-center justify-between mt-6">
+            <div>
+              <p class="text-xs text-gray-500">Tracking Number</p>
+              <p id="found-tracking" class="text-4xl font-mono font-bold text-green-700"></p>
+              <p id="found-carrier" class="text-xl font-semibold text-green-600"></p>
+            </div>
+            <a id="track-btn" href="#" target="_blank"
+               class="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-2xl font-semibold flex items-center gap-2 transition">
+              <span>Track on 17track</span>
+              <span class="text-2xl">→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 text-xs text-gray-500 space-y-2">
+        <p>📌 How to use:</p>
+        <p>1. Choose a tab above</p>
+        <p>2. Enter tracking number OR last 4 digits of your phone</p>
+        <p>3. System auto-detects carrier and opens 17track</p>
+        <p class="text-amber-600">For Anona Beta Group members only • Data runs locally on your device</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const users = [
+      { last4: "3166", name: "Brian Porter", tracking: "9214490358020057633026", carrier: "YDH" },
+      { last4: "0804", name: "Caly Albery", tracking: "UUS64G0760286495263", carrier: "YDH" },
+      { last4: "0441", name: "Cheryl Knox", tracking: "UUS64G0760086947358", carrier: "YDH" },
+      { last4: "9940", name: "Danielle Cuddington", tracking: "UUS64G0760887399441", carrier: "YDH" },
+      { last4: "6551", name: "Don Wendt", tracking: "UUS64G0760687851533", carrier: "YDH" },
+      { last4: "8659", name: "Elizabeth Roe", tracking: "9214490358020057634026", carrier: "YDH" },
+      { last4: "5660", name: "Gerard Brennan", tracking: "UUS64G0760488303625", carrier: "YDH" },
+      { last4: "3524", name: "GC Esposito", tracking: "UUS64G0760288755715", carrier: "YDH" },
+      { last4: "0141", name: "Glenn Leigh", tracking: "UUS64G0760089207806", carrier: "YDH" },
+      { last4: "0854", name: "Jason Wunsch", tracking: "UUS64G0760889659895", carrier: "YDH" },
+      { last4: "7716", name: "Joe Gregory", tracking: "UUS64G0760690111982", carrier: "YDH" },
+      { last4: "1772", name: "Levi Weatherford", tracking: "9214490358020057635026", carrier: "YDH" },
+      { last4: "0398", name: "Nicholas Dhuyvetter", tracking: "UUS64G0760490564072", carrier: "YDH" },
+      { last4: "7640", name: "patric gaines", tracking: "9214490358020057636026", carrier: "YDH" },
+      { last4: "4989", name: "Sujith Kumar", tracking: "UUS64G0760291016161", carrier: "YDH" },
+      { last4: "8477", name: "Tameka Dixon", tracking: "UUS64G0760091468252", carrier: "YDH" },
+      { last4: "0844", name: "York Chanchai Paephanich", tracking: "UUS64G0760891920342", carrier: "YDH" },
+      { last4: "5906", name: "Oleg Tsantsaridi", tracking: "UUS64G0760692372435", carrier: "YDH" },
+      { last4: "6661", name: "AntonyNg", tracking: "7321315563379586", carrier: "UBI" },
+      { last4: "4330", name: "Vladislav Veresov", tracking: "7321315563379647", carrier: "UBI" },
+      { last4: "0644", name: "Hamza Zemirline", tracking: "7321315563379654", carrier: "UBI" },
+      { last4: "3308", name: "Daniel Tsui", tracking: "7321315563379616", carrier: "UBI" },
+      { last4: "2352", name: "Affandi Teguh", tracking: "7321315563379630", carrier: "UBI" },
+      { last4: "5432", name: "Linda Zaim", tracking: "7321315563379623", carrier: "UBI" },
+      { last4: "6220", name: "Mohamad Mounib AlRifai", tracking: "7321315563379609", carrier: "UBI" },
+      { last4: "5368", name: "Jin Cao", tracking: "7321315563379593", carrier: "UBI" }
+    ];
+
+    function getCarrierInfo(carrier) {
+      const c = (carrier || '').toUpperCase();
+      if (c === 'UBI') return { code: 'ubi', name: 'UBI', display: 'UBI' };
+      return { code: 'ydh', name: 'YDH', display: 'YDH' };
+    }
+
+    function switchTab(n) {
+      document.getElementById('panel0').classList.toggle('hidden', n !== 0);
+      document.getElementById('panel1').classList.toggle('hidden', n !== 1);
+      document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+        btn.classList.toggle('border-indigo-600', i === n);
+        btn.classList.toggle('text-indigo-600', i === n);
+        btn.classList.toggle('text-gray-500', i !== n);
+      });
+    }
+
+    function checkByTracking() {
+      const input = document.getElementById('tracking').value.trim();
+      if (!input) return alert('Please enter your tracking number');
+      const num = input.toUpperCase();
+      const carrier = num.startsWith('732') ? { code: 'ubi', name: 'UBI', display: 'UBI' } : { code: 'ydh', name: 'YDH', display: 'YDH' };
+      window.open(`https://www.17track.net/en/carriers/${carrier.code}`, '_blank');
+    }
+
+    function searchByPhone() {
+      let input = document.getElementById('phone-last4').value.trim();
+      if (!input || input.length !== 4) return alert('Please enter exactly 4 digits');
+      const results = users.filter(u => u.last4 === input);
+      const resultDiv = document.getElementById('result');
+      if (results.length === 0) {
+        resultDiv.classList.add('hidden');
+        return alert('No matching record found. Please double-check the last 4 digits of your phone number.');
+      }
+      const user = results[0];
+      const carrier = getCarrierInfo(user.carrier);
+      document.getElementById('found-name').textContent = user.name;
+      document.getElementById('found-tracking').textContent = user.tracking;
+      document.getElementById('found-carrier').innerHTML = `${carrier.display} <span class="text-sm font-normal">(${carrier.name})</span>`;
+      const btn = document.getElementById('track-btn');
+      btn.href = `https://www.17track.net/en/carriers/${carrier.code}`;
+      resultDiv.classList.remove('hidden');
+    }
+
+    document.getElementById('tracking').addEventListener('keypress', e => { if (e.key === 'Enter') checkByTracking(); });
+    document.getElementById('phone-last4').addEventListener('keypress', e => { if (e.key === 'Enter') searchByPhone(); });
+  </script>
+</body>
+</html>
