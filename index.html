@@ -7,7 +7,7 @@
 </div>
 
 <script>
-// ==================== PRIVATE TRACKING DATA (simplified - no carrier parameter) ====================
+// ==================== PRIVATE TRACKING DATA ====================
 const trackingData = {
   "AN-7K9P2M": { name: "Brian Porter", trackingNo: "9214490358020057633026" },
   "AN-8X4Q5R": { name: "Caly Albery", trackingNo: "US564G0760286495263" },
@@ -37,21 +37,29 @@ const trackingData = {
   "AN-6K9P3J": { name: "Jin Cao", trackingNo: "7321315563379593" }
 };
 
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const originalText = event.target.innerText;
+    event.target.innerText = "✅ Copied!";
+    setTimeout(() => { event.target.innerText = originalText; }, 2000);
+  });
+}
+
 function searchByCode() {
   const input = document.getElementById("codeInput").value.trim().toUpperCase();
   const data = trackingData[input];
   const resultDiv = document.getElementById("result");
   
   if (data) {
-    const trackLink = `https://www.17track.net/en/track?nums=${data.trackingNo}`;
+    const trackLink = "https://www.17track.net/";
     resultDiv.innerHTML = `
       <p>✅ Hello, <strong>${data.name}</strong>!</p>
-      <p>Your tracking number: <strong>${data.trackingNo}</strong></p>
-      <p><a href="${trackLink}" target="_blank" style="color:#007bff; font-size:20px; text-decoration:none;">👉 Click to view live status on 17TRACK</a></p>
-      <p style="font-size:14px; color:#555;">
-        Expected delivery: 10-15 days.<br>
-        <strong>Note:</strong> If it asks to "Select carrier", just choose <strong>YDH</strong> (it appears in Search history).
+      <p>Your tracking number: 
+        <strong>${data.trackingNo}</strong> 
+        <button onclick="copyToClipboard('${data.trackingNo}')" style="margin-left:8px; padding:4px 10px; font-size:14px; background:#28a745; color:white; border:none; border-radius:4px; cursor:pointer;">Copy</button>
       </p>
+      <p><a href="${trackLink}" target="_blank" style="color:#007bff; font-size:20px; text-decoration:none;">👉 Go to 17TRACK official website to track your package</a></p>
+      <p style="font-size:14px; color:#555;">Expected delivery: 10-15 days. Reply to me if you need help.</p>
     `;
   } else {
     resultDiv.innerHTML = `<p style="color:red;">❌ Invalid code. Please check and try again.</p>`;
